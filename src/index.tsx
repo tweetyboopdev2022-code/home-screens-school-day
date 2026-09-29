@@ -1,6 +1,6 @@
 import React from 'react';
 import type { PluginComponentProps } from './hs-plugin';
-import { frame, ink, caps, Icon, I, Shape, sdk, useNow, dayKey, localHM } from './ui';
+import { frame, ink, caps, Icon, I, Shape, sdk, useNow, dayKey, localHM, Fit } from './ui';
 import { parseOff, parseOverrides, cycleDay, nextSchoolDay, isSchoolDay, addDays, parseSchedule, parseBring, bringFor, NO_SCHOOL, closure, CycleCfg } from './logic';
 
 type Ev = { id: string; title: string; start: string; end?: string; allDay: boolean; sourceId?: string };
@@ -77,7 +77,9 @@ export default function SchoolDay(props: PluginComponentProps & { events?: Ev[];
   );
 
   return (
-    <div style={frame(style, { gap: '0.75em' })}>
+    <div style={frame(style)}>
+      <Fit max={1.9} min={0.55}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75em' }}>
       {closed && (
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.6em', padding: '0.55em 0.8em', borderRadius: '0.7em', color: '#fff', background: closed === 'closed' ? '#dc2626' : '#d97706' }}>
           <Icon d={X.alert} size="1.3em" stroke={2.2} />
@@ -108,17 +110,19 @@ export default function SchoolDay(props: PluginComponentProps & { events?: Ev[];
       )}
 
       {soon.length > 0 && (
-        <div style={{ marginTop: 'auto', paddingTop: '0.6em', borderTop: `1px solid ${ink(style, 0.08)}`, display: 'flex', flexDirection: 'column', gap: '0.3em' }}>
+        <div style={{ marginTop: '0.3em', paddingTop: '0.6em', borderTop: `1px solid ${ink(style, 0.08)}`, display: 'flex', flexDirection: 'column', gap: '0.3em' }}>
           <div style={caps}>Coming up</div>
           {soon.map(({ e, d }) => (
             <div key={e.id} style={{ display: 'flex', alignItems: 'center', gap: '0.6em', fontSize: '0.85em' }}>
               <span style={{ width: '6.5em', flexShrink: 0, opacity: 0.55, fontSize: '0.85em' }}>{label(d)}</span>
-              <span style={{ fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{e.title}</span>
+              <span style={{ fontWeight: 500, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.title}</span>
             </div>
           ))}
         </div>
       )}
-      {soon.length === 0 && <div style={{ marginTop: 'auto', fontSize: '0.7em', opacity: 0.4 }}>No tests or library returns on the calendar in the next 10 days.</div>}
+      {soon.length === 0 && <div style={{ marginTop: '0.3em', fontSize: '0.7em', opacity: 0.4 }}>No tests or library returns on the calendar in the next 10 days.</div>}
+      </div>
+      </Fit>
     </div>
   );
 }

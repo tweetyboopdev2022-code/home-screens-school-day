@@ -90,3 +90,49 @@ export const dayKey = (d: Date, tz?: string) => new Intl.DateTimeFormat('en-CA',
 export const localHM = (d: Date, tz?: string) => { const p = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: tz }).format(d).split(':').map(Number); return p[0] * 60 + p[1]; };
 export const weekday = (d: Date, tz?: string) => ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(new Intl.DateTimeFormat('en-US', { weekday: 'short', timeZone: tz }).format(d));
 export const parseHM = (s: string) => { const [h, m] = String(s || '0:0').split(':').map(Number); return (h || 0) * 60 + (m || 0); };
+
+/** Live size of an element (layout px, unaffected by the editor's zoom). */
+export function useBox<T extends HTMLElement = HTMLDivElement>(): [React.RefObject<T | null>, { w: number; h: number }] {
+  const ref = React.useRef<T>(null);
+  const [box, setBox] = React.useState({ w: 0, h: 0 });
+  React.useLayoutEffect(() => {
+    const el = ref.current; if (!el) return;
+    const ro = new ResizeObserver(([e]) => {
+      const { width: w, height: h } = e.contentRect;
+      setBox((b) => (Math.abs(b.w - w) < 1 && Math.abs(b.h - h) < 1 ? b : { w, h }));
+    });
+    ro.observe(el); return () => ro.disconnect();
+  }, []);
+  return [ref, box];
+}
+
+/** Scales its content (via font-size) to the largest size that fits the space it's given:
+ *  shrinks instead of cutting text off, grows to use empty room. */
+export function Fit({ children, min = 0.6, max = 1.8, justify = 'center', style }: {
+  children: React.ReactNode; min?: number; max?: number; justify?: React.CSSProperties['justifyContent']; style?: React.CSSProperties;
+}) {
+  const outer = React.useRef<HTMLDivElement>(null);
+  const inner = React.useRef<HTMLDivElement>(null);
+  const fit = React.useCallback(() => {
+    const o = outer.current, i = inner.current; if (!o || !i || !o.clientHeight) return;
+    const fits = (k: number) => { i.style.fontSize = `${k}em`; return i.scrollHeight <= o.clientHeight + 1 && i.scrollWidth <= o.clientWidth + 1; };
+    let lo = min, hi = max;
+    if (fits(hi)) lo = hi; else for (let n = 0; n < 9; n++) { const mid = (lo + hi) / 2; if (fits(mid)) lo = mid; else hi = mid; }
+    i.style.fontSize = `${lo}em`;
+  }, [min, max]);
+  React.useLayoutEffect(() => {
+    fit();
+    const ro = new ResizeObserver(() => fit()); if (outer.current) ro.observe(outer.current);
+    const mo = new MutationObserver(() => fit()); if (inner.current) mo.observe(inner.current, { childList: true, subtree: true, characterData: true });
+    const t = window.setTimeout(fit, 400);   // after web fonts / images settle
+    return () => { ro.disconnect(); mo.disconnect(); clearTimeout(t); };
+  }, [fit]);
+  return (
+    <div ref={outer} style={{ flex: 1, minHeight: 0, width: '100%', display: 'flex', flexDirection: 'column', justifyContent: justify, overflow: 'hidden', ...style }}>
+      <div ref={inner} style={{ width: '100%', flexShrink: 0 }}>{children}</div>
+    </div>
+  );
+}
+
+/** Clamp text to n lines with an ellipsis (wraps instead of cutting one line short). */
+export const clampLines = (n: number): React.CSSProperties => ({ display: '-webkit-box', WebkitLineClamp: n, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'break-word' });
