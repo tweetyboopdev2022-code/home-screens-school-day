@@ -1,8 +1,8 @@
 {
   "id": "school-day",
   "name": "School Day",
-  "version": "1.1.0",
-  "description": "Today's or tomorrow's school cycle day (Day 1\u20135), the classes on it, what to bring, upcoming tests and library returns from the calendar, and storm-closure alerts.",
+  "version": "1.1.1",
+  "description": "Today's or tomorrow's school cycle day (Day 1–5), the classes on it, what to bring, upcoming tests and library returns from the calendar, and storm-closure alerts.",
   "author": "Tanya",
   "license": "MIT",
   "minAppVersion": "1.7.1",
@@ -21,7 +21,7 @@
     "overrides": "",
     "schedule": "1: English, Math, Gym\n2: French, Science, Music\n3: English, Math, Library\n4: French, Art, Gym\n5: English, Math, Ethics",
     "bring": "Gym: running shoes & gym clothes\nLibrary: library books\nMusic: recorder",
-    "remindKeywords": "test|quiz|exam|dict[\u00e9e]e|spelling|library|due|project|presentation|field trip|photo|bring|show and tell",
+    "remindKeywords": "test|quiz|exam|dict[ée]e|spelling|library|due|project|presentation|field trip|photo|bring|show and tell",
     "switchHour": 15,
     "checkClosures": true,
     "closureUrl": "https://www.swlauriersb.qc.ca/en/",
@@ -65,18 +65,18 @@
         "title": "What to bring",
         "ui:widget": "textarea",
         "ui:group": "Schedule",
-        "description": "Class: item \u2014 shown on days with that class"
+        "description": "Class: item — shown on days with that class"
       },
       "anchorDate": {
         "type": "string",
-        "title": "A known date\u2026",
+        "title": "A known date…",
         "ui:widget": "text",
         "ui:group": "Cycle",
         "description": "YYYY-MM-DD"
       },
       "anchorDay": {
         "type": "number",
-        "title": "\u2026was cycle day",
+        "title": "…was cycle day",
         "ui:widget": "text",
         "ui:group": "Cycle"
       },

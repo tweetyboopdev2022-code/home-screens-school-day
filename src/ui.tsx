@@ -122,10 +122,14 @@ export function Fit({ children, min = 0.6, max = 1.8, justify = 'center', style 
   }, [min, max]);
   React.useLayoutEffect(() => {
     fit();
-    const ro = new ResizeObserver(() => fit()); if (outer.current) ro.observe(outer.current);
-    const mo = new MutationObserver(() => fit()); if (inner.current) mo.observe(inner.current, { childList: true, subtree: true, characterData: true });
-    const t = window.setTimeout(fit, 400);   // after web fonts / images settle
-    return () => { ro.disconnect(); mo.disconnect(); clearTimeout(t); };
+    // Re-fit when the space changes AND when the content changes size (data arriving, images loading).
+    // fit() is idempotent, so observing the inner box can't loop.
+    let raf = 0; const again = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(fit); };
+    const ro = new ResizeObserver(again); if (outer.current) ro.observe(outer.current); if (inner.current) ro.observe(inner.current);
+    const mo = new MutationObserver(again); if (inner.current) mo.observe(inner.current, { childList: true, subtree: true, characterData: true });
+    const t = window.setTimeout(fit, 400), t2 = window.setTimeout(fit, 2000);   // after web fonts / images settle
+    (document as any).fonts?.ready?.then(again);
+    return () => { ro.disconnect(); mo.disconnect(); clearTimeout(t); clearTimeout(t2); cancelAnimationFrame(raf); };
   }, [fit]);
   return (
     <div ref={outer} style={{ flex: 1, minHeight: 0, width: '100%', display: 'flex', flexDirection: 'column', justifyContent: justify, overflow: 'hidden', ...style }}>
