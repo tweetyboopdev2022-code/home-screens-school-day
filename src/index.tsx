@@ -114,7 +114,7 @@ export default function SchoolDay(props: PluginComponentProps & { events?: Ev[];
           <div style={caps}>Coming up</div>
           {soon.map(({ e, d }) => (
             <div key={e.id} style={{ display: 'flex', alignItems: 'center', gap: '0.6em', fontSize: '0.85em' }}>
-              <span style={{ width: '6.5em', flexShrink: 0, opacity: 0.55, fontSize: '0.85em' }}>{label(d)}</span>
+              <span style={{ width: '8em', flexShrink: 0, opacity: 0.6, fontSize: '0.85em', whiteSpace: 'nowrap' }}>{longDate(d)}{d === today ? ' (today)' : d === addDays(today, 1) ? ' (tomorrow)' : ''}</span>
               <span style={{ fontWeight: 500, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.title}</span>
             </div>
           ))}

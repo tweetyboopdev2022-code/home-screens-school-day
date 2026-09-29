@@ -1,7 +1,7 @@
 {
   "id": "school-day",
   "name": "School Day",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Today's or tomorrow's school cycle day (Day 1–5), the classes on it, what to bring, upcoming tests and library returns from the calendar, and storm-closure alerts.",
   "author": "Tanya",
   "license": "MIT",
